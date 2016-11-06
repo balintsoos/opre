@@ -3,6 +3,8 @@
 #include <string.h>
 #include <time.h>
 
+typedef enum { false, true } bool;
+
 // Events
 struct Event
 {
@@ -55,6 +57,16 @@ void write_events(int from, int to)
 	fclose(file);
 }
 
+void append_event(struct Event new_event)
+{
+	FILE* file;
+	file = fopen("events", "a");
+
+	fwrite(&new_event, sizeof(struct Event), 1, file);
+	
+	fclose(file);
+}
+
 void list_events()
 {
 	read_events();
@@ -82,11 +94,7 @@ void create_event()
 	new_event.guestCount = 0;
 	strcpy(new_event.name, new_name);
 
-	// append to events file
-	FILE* file;
-	file = fopen("events", "a");
-	fwrite(&new_event, sizeof(struct Event), 1, file);
-	fclose(file);
+	append_event(new_event);
 }
 
 void delete_event()
@@ -165,9 +173,27 @@ void read_guests()
 	}
 }
 
-void write_guests()
+void write_guests(int from, int to)
 {
+	FILE* file;
+	file = fopen("guests", "w");
 
+	for (int i = from; i < to; ++i)
+	{
+		fwrite(&guests[i], sizeof(struct Guest), 1, file);
+	}
+	
+	fclose(file);
+}
+
+void append_guest(struct Guest new_guest)
+{
+	FILE* file;
+	file = fopen("guests", "a");
+
+	fwrite(&new_guest, sizeof(struct Guest), 1, file);
+	
+	fclose(file);
 }
 
 void list_guests()
@@ -185,7 +211,53 @@ void list_guests()
 
 void add_guest()
 {
-	
+	read_events();
+	read_guests();
+
+	struct Guest new_guest;
+
+	new_guest.signup = time(NULL);
+	new_guest.id = next_guest_id;
+
+	char new_name[100];
+	printf("\nName: ");
+	scanf (" %[^\n]%*c", new_name);
+	strcpy(new_guest.name, new_name);
+
+	char new_email[100];
+	printf("\nE-mail address: ");
+	scanf (" %[^\n]%*c", new_email);
+	strcpy(new_guest.email, new_email);
+
+	int new_event_id;
+	printf("\nEvent ID: ");
+	scanf (" %d", &new_event_id);
+
+	bool isValidEventId = false;
+
+	for (int i = 0; i < next_event_index; ++i)
+	{
+		if (events[i].id == new_event_id)
+		{
+			isValidEventId = true;
+			events[i].guestCount += 1;
+			new_guest.event_queue = events[i].guestCount;
+			break;
+		}
+	}
+
+	if (!isValidEventId)
+	{
+		printf("\nEvent ID not found\n");
+		return;
+	}
+
+	new_guest.event_id = new_event_id;
+
+	write_events(0, next_event_index);
+	append_guest(new_guest);
+
+	printf("\nGuest placed in position %d on Event %d\n", new_guest.event_queue, new_guest.event_id);
 }
 
 void edit_guest()
