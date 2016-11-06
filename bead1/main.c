@@ -200,12 +200,12 @@ void list_guests()
 {
 	read_guests();
 
-	printf("\nID\tName\tE-mail\tEvent ID\tQueue\tSign up\n");
+	printf("\nID\tName\tE-mail\tEvent ID\tSign up\n");
 	printf("----------------------------------------------------------------\n");
 
 	for (int i = 0; i < next_guest_index; ++i)
 	{
-		printf("%d\t%s\t%s\t%d\t%d\t%s\n", guests[i].id, guests[i].name, guests[i].email, guests[i].event_id, guests[i].event_queue, ctime(&guests[i].signup));
+		printf("%d\t%s\t%s\t%d\t%s\n", guests[i].id, guests[i].name, guests[i].email, guests[i].event_id, ctime(&guests[i].signup));
 	}
 }
 
@@ -297,7 +297,47 @@ void edit_guest()
 
 void remove_guest()
 {
-	
+	read_events();
+	read_guests();
+
+	int id;
+	printf("\nRemove guest by ID: ");
+	scanf("%d", &id);
+
+	int delete_position = -1;
+
+	for (int i = 0; i < next_guest_index; ++i)
+	{
+		if (guests[i].id == id)
+		{
+			delete_position = i;
+
+			for (int j = 0; j < next_event_index; ++j)
+			{
+				if (events[j].id == guests[i].event_id)
+				{
+					events[j].guestCount -= 1;
+					break;
+				}
+			}
+
+			break;
+		}
+	}
+
+	if (delete_position == -1)
+	{
+		printf("\nGuest ID not found\n");
+		return;
+	}
+
+	for (delete_position; delete_position < next_guest_index; ++delete_position)
+	{
+		guests[delete_position] = guests[delete_position + 1];
+	}
+
+	write_events(0, next_event_index);
+	write_guests(0, next_guest_index - 1);
 }
 
 void menu()
