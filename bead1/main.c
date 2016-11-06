@@ -262,7 +262,37 @@ void add_guest()
 
 void edit_guest()
 {
-	
+	read_guests();
+
+	int id;
+	printf("\nEdit guest by ID: ");
+	scanf("%d", &id);
+
+	bool isValidGuestId = false;
+
+	for (int i = 0; i < next_guest_index; ++i)
+	{
+		if (guests[i].id == id)
+		{
+			isValidGuestId = true;
+
+			printf("\nNew name: ");
+			scanf (" %[^\n]%*c", guests[i].name);
+
+			printf("\nNew e-mail address: ");
+			scanf (" %[^\n]%*c", guests[i].email);
+
+			break;
+		}
+	}
+
+	if (!isValidGuestId)
+	{
+		printf("\nGuest ID not found\n");
+		return;
+	}
+
+	write_guests(0, next_guest_index);
 }
 
 void remove_guest()
