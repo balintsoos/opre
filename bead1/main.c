@@ -12,12 +12,13 @@ struct Event
 };
 
 struct Event events[100];
-int last_event_index = 0;
+
+int next_event_index = 0;
 int next_event_id = 0;
 
-void load_events()
+void read_events()
 {
-	last_event_index = 0;
+	next_event_index = 0;
 
 	FILE* file;
 	file = fopen("events", "r");
@@ -26,14 +27,14 @@ void load_events()
 	{
 		while (!feof(file))
 		{
-			if (fread(&(events[last_event_index]), sizeof(struct Event), 1, file))
+			if (fread(&(events[next_event_index]), sizeof(struct Event), 1, file))
 			{
-				if (events[last_event_index].id >= next_event_id)
+				if (events[next_event_index].id >= next_event_id)
 				{
-					next_event_id = events[last_event_index].id + 1;
+					next_event_id = events[next_event_index].id + 1;
 				}
 
-				++last_event_index;
+				++next_event_index;
 			}
 		}
 
@@ -41,14 +42,27 @@ void load_events()
 	}
 }
 
+void write_events(int from, int to)
+{
+	FILE* file;
+	file = fopen("events", "w");
+
+	for (int i = from; i < to; ++i)
+	{
+		fwrite(&events[i], sizeof(struct Event), 1, file);
+	}
+	
+	fclose(file);
+}
+
 void list_events()
 {
-	load_events();
+	read_events();
 
 	printf("\nID\tName\tNumber of guests\n");
 	printf("------------------------------------\n");
 
-	for (int i = 0; i < last_event_index; ++i)
+	for (int i = 0; i < next_event_index; ++i)
 	{
 		printf("%d\t%s\t%d\n", events[i].id, events[i].name, events[i].guestCount);
 	}
@@ -56,7 +70,7 @@ void list_events()
 
 void create_event()
 {
-	load_events();
+	read_events();
 
 	struct Event new_event;
 	char new_name[100];
@@ -77,7 +91,36 @@ void create_event()
 
 void delete_event()
 {
-	
+	read_events();
+
+	int id;
+
+	printf("\nDelete event by ID: ");
+	scanf("%d", &id);
+
+	int delete_position = -1;
+
+	for (int i = 0; i < next_event_index; ++i)
+	{
+		if (id == events[i].id)
+		{
+			delete_position = i;
+			break;
+		}
+	}
+
+	if (delete_position == -1)
+	{
+		printf("\nEvent ID not found\n");
+		return;
+	}
+
+	for (delete_position; delete_position < next_event_index; ++delete_position)
+	{
+		events[delete_position] = events[delete_position + 1];
+	}
+
+	write_events(0, next_event_index - 1);
 }
 
 // Guests
@@ -88,12 +131,56 @@ struct Guest
 	char email[100];
 	int event_id;
 	int event_queue;
-	time_t signup_time;
+	time_t signup;
 };
+
+struct Guest guests[100];
+
+int next_guest_index = 0;
+int next_guest_id = 0;
+
+void read_guests()
+{
+	next_guest_index = 0;
+
+	FILE* file;
+	file = fopen("guests", "r");
+
+	if (file)
+	{
+		while (!feof(file))
+		{
+			if (fread(&(guests[next_guest_index]), sizeof(struct Guest), 1, file))
+			{
+				if (guests[next_guest_index].id >= next_guest_id)
+				{
+					next_guest_id = guests[next_guest_index].id + 1;
+				}
+
+				++next_guest_index;
+			}
+		}
+
+		fclose(file);
+	}
+}
+
+void write_guests()
+{
+
+}
 
 void list_guests()
 {
-	
+	read_guests();
+
+	printf("\nID\tName\tE-mail\tEvent ID\tQueue\tSign up\n");
+	printf("----------------------------------------------------------------\n");
+
+	for (int i = 0; i < next_guest_index; ++i)
+	{
+		printf("%d\t%s\t%s\t%d\t%d\t%s\n", guests[i].id, guests[i].name, guests[i].email, guests[i].event_id, guests[i].event_queue, ctime(&guests[i].signup));
+	}
 }
 
 void add_guest()
@@ -128,7 +215,8 @@ void menu()
 		
 		scanf("%d", &selected_option);
 		
-		switch (selected_option) {
+		switch (selected_option)
+		{
 			case 1: list_events();
 			break;
 			case 2: create_event();
