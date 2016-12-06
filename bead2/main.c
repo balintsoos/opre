@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <errno.h>
 
 typedef enum { false, true } bool;
 
@@ -138,9 +144,9 @@ void delete_event()
 		return;
 	}
 
-	for (delete_position; delete_position < next_event_index; ++delete_position)
+	for (int i = delete_position; i < next_event_index; ++i)
 	{
-		events[delete_position] = events[delete_position + 1];
+		events[i] = events[i + 1];
 	}
 
 	write_events(0, next_event_index - 1);
@@ -346,13 +352,18 @@ void remove_guest()
 		return;
 	}
 
-	for (delete_position; delete_position < next_guest_index; ++delete_position)
+	for (int i = delete_position; i < next_guest_index; ++i)
 	{
-		guests[delete_position] = guests[delete_position + 1];
+		guests[i] = guests[i + 1];
 	}
 
 	write_events(0, next_event_index);
 	write_guests(0, next_guest_index - 1);
+}
+
+void handleSignal(int signumber)
+{
+
 }
 
 void start_event()
@@ -370,12 +381,67 @@ void start_event()
 		return;
 	}
 
-	for (int i = 0; i < next_guest_index; ++i)
+	signal(SIGTERM, handleSignal);
+
+	int pipefd[next_guest_index]; // unnamed pipe file descriptor array
+
+	if (pipe(pipefd) == -1)
 	{
-		if (guests[i].event_id == id)
+		perror("Pipe opening was not succesful\n");
+		exit(EXIT_FAILURE);
+	}
+
+	pid_t child = fork();
+
+	if (child < 0) // error
+	{
+		perror("Fork calling was not succesful\n");
+		exit(EXIT_FAILURE);
+	}
+	else if (child > 0) // the parent process, it can see the returning value of fork
+	{
+		printf("I am the Parent process\n");
+		printf("My pid is %i\n", getpid());
+		printf("My parent's pid is %i\n", getppid());
+
+		close(pipefd[0]); // close unused read end
+
+		pause();
+
+		for (int i = 0; i < next_guest_index; ++i)
 		{
-			printf("%d\t%s\t%s\t%d\n", guests[i].id, guests[i].name, guests[i].email, guests[i].event_id);
+			if (guests[i].event_id == id)
+			{
+				printf("%d\t%s\n", guests[i].id, guests[i].name);
+				write(pipefd[1], guests[i].id, 20);
+			}
 		}
+
+		close(pipefd[1]); // close write descriptor
+		fflush(NULL);
+
+		int status;
+		waitpid(child, &status, 0);
+
+		printf("The end of parent process\n");
+	}
+	else // child process
+	{
+		printf("I am the Child process\n");
+		printf("My pid is %i\n", getpid());
+		printf("My parent's pid is %i\n", getppid());
+
+		sleep(3);
+
+		kill(getppid(), SIGTERM);
+
+		close(pipefd[1]); // close the unused write end
+
+		int container;
+		read(pipefd[0], container, sizeof(container));
+		printf("Arrived data: %d\n", container);
+
+		close(pipefd[0]); // finally we close the used read end
 	}
 }
 
