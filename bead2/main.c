@@ -472,23 +472,33 @@ void start_event()
 
 		sleep(2);
 
-		printf("\nRegistered guests:\n");
+		printf("\nEvent started\n\nRegistered guests:\n");
+
+		srand(time(NULL));
 
 		for (int i = 0; i < registeredGuestCount; ++i) {
 			char buffer[100];
 			read(pipefd[0], &buffer, sizeof(buffer));
-			printf("%s\n", buffer);
+
+			if (rand() / (RAND_MAX + 1.0) < 0.9)
+			{
+				printf("%s is here\n", buffer);
+			}
+			else
+			{
+				printf("%s is not here\n", buffer);
+				struct message guest = { 2, "" };
+				sprintf(guest.mtext, "%s", buffer);
+				msgsnd(msgqueue, &guest, strlen(guest.mtext), 0);
+			}
 		}
 
-		printf("\nEvent started\n");
 		sleep(2);
-		printf("Event ended\n");
+		printf("\nEvent ended\n");
 
-		struct message m = { 1, "" };
-		srand(time(NULL));
-		sprintf(m.mtext, "%d/10", rand() % 11);
-
-		msgsnd(msgqueue, &m, strlen(m.mtext), 0);
+		struct message review = { 1, "" };
+		sprintf(review.mtext, "%d/10", rand() % 11);
+		msgsnd(msgqueue, &review, strlen(review.mtext), 0);
 
 		close(pipefd[0]); // finally we close the used read end
 		exit(EXIT_SUCCESS);
