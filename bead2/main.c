@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
 #include <errno.h>
 
 typedef enum { false, true } bool;
@@ -362,6 +364,7 @@ void remove_guest()
 }
 
 static int organiser_arrived = 0;
+static key_t key;
 
 static void handleSignal(int signumber)
 {
@@ -398,7 +401,20 @@ void start_event()
 		}
 	}
 
+	struct message {
+		long mtype;
+		char mtext[1024];
+	};
+
+	int msgqueue = msgget(key, 0600 | IPC_CREAT);
+
+	if (msgqueue < 0 ) {
+		perror("msgget");
+		exit(EXIT_FAILURE);
+	}
+
 	int pipefd[2]; // unnamed pipe file descriptor array
+
 	pid_t cpid; // child process
 
 	if (pipe(pipefd) == -1)
@@ -436,10 +452,15 @@ void start_event()
 
 		close(pipefd[1]); // close write descriptor
 
+		struct message m;
+		msgrcv(msgqueue, &m, 1024, 1, 0);
+
+		printf("\nEvent review received: %s\n", m.mtext);
+
 		int status;
 		waitpid(cpid, &status, 0);
 
-		printf("The end of parent process\n");
+		printf("\nEvent organiser returned\n");
 	}
 	else // child process
 	{
@@ -458,6 +479,16 @@ void start_event()
 			read(pipefd[0], &buffer, sizeof(buffer));
 			printf("%s\n", buffer);
 		}
+
+		printf("\nEvent started\n");
+		sleep(2);
+		printf("Event ended\n");
+
+		struct message m = { 1, "" };
+		srand(time(NULL));
+		sprintf(m.mtext, "%d/10", rand() % 11);
+
+		msgsnd(msgqueue, &m, strlen(m.mtext), 0);
 
 		close(pipefd[0]); // finally we close the used read end
 		exit(EXIT_SUCCESS);
@@ -506,6 +537,8 @@ void menu()
 
 int main(int argc, char** argv)
 {
+	key = ftok(argv[0], 1);
+
 	menu();
 
   return 0;
