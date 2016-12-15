@@ -42,14 +42,6 @@ int main(int argc, char** argv)
   int minNumber = 1;
   int maxNumber = atoi(argv[1]);
 
-  int pipefd[2]; // unnamed pipe file descriptor array
-
-  if (pipe(pipefd) == -1)
-	{
-		perror("Pipe opening was not succesful\n");
-		exit(EXIT_FAILURE);
-	}
-
   signal(SIGTERM, handleSignal);
   pid_t cpid;
   cpid = fork();
@@ -63,8 +55,11 @@ int main(int argc, char** argv)
   {
     int random = rand() % (maxNumber + 1 - minNumber) + minNumber;
 
-    write(pipefd[1], &random, sizeof(random));
-    write(pipefd[1], &maxNumber, sizeof(maxNumber));
+    struct message ms = { 1, "" };
+    sprintf(ms.mtext, "%i", random);
+    msgsnd(msgqueue, &ms, strlen(ms.mtext), 0);
+    sprintf(ms.mtext, "%i", maxNumber);
+    msgsnd(msgqueue, &ms, strlen(ms.mtext), 0);
 
     pause();
 
@@ -85,14 +80,15 @@ int main(int argc, char** argv)
     int myNumber;
     int maxNumber;
 
-    read(pipefd[0], &myNumber, sizeof(myNumber));
-    read(pipefd[0], &maxNumber, sizeof(maxNumber));
+    struct message m;
+		msgrcv(msgqueue, &m, 1024, 1, 0);
+    myNumber = atoi(m.mtext);
+    msgrcv(msgqueue, &m, 1024, 1, 0);
+    maxNumber = atoi(m.mtext);
 
     printf("My number: %i, Remaining: %i\n", myNumber, maxNumber - myNumber);
 
     double chance = (double)rand() / (double)RAND_MAX;
-
-    printf("%f\n", chance);
 
     char mode[100];
 
