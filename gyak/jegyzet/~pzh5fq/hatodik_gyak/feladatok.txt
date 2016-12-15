@@ -1,0 +1,3 @@
+1. Sima szemafor: Legyen 3 folyamat, legyen egy shared memory valtozo string tipusban. A program elejen csak egy folyamat ferjen hozza, irjon bele valamit, utana ferjen hozza egy masik, az tegyen hozza valamit, erre hozzaferhet a harmadik, az pedig olvassa ki es irja ki.
+2. Sima message queue: Ket folyamat, egyik kuld ket uzenetet kulonbozo id-vel, masik folyamat olvassa ki forditott sorrendben.
+3. Posix message queue: Ket folyamat, egyik kuld eloszor egy kisebb, aztan egy nagyobb prioritasu uzenetet. Bizonyosodjunk meg rola, hogy a masik oldalon a nagyobb prioritasu uzenetet olvashatjuk ki elobb.

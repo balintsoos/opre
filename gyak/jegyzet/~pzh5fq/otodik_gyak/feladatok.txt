@@ -1,0 +1,3 @@
+1. Kuldjunk at egy structot (egy int es egy char[80] adattag) nevesitet csovon keresztul. (Es olvassuk ki a masik oldalon.)
+2. Kuldjunk at 2 masodpercenkent 3 uzenetet egy nevesitett csovon keresztul. Masik oldalon pollozzunk (irasra varjunk), de a poll hivas elott varjunk 1,2,3 masodpercet.
+3. Osszunk meg egy structot (egy int es egy char[80] adattag) osztott memorian keresztul. Egyik folyamat irjon, masik olvassa ki.

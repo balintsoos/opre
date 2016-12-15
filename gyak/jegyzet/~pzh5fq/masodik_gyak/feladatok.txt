@@ -1,0 +1,7 @@
+1. Hozzunk letre egy fajlt, es irjuk bele a nevunket (ugyanabbol a programbol)
+2. Definialjunk egy tetszoleges structot ket int adattaggal, adjunk az adattagoknak erteket, irjuk ki fajlba (binaris modban), olvassuk vissza (szinten binaris modban), majd ellenorizzuk, hogy azt olvastuk ki, amit beirtunk!
+2.b A szamokat program parameterben kerjuk be! (Szukseg lehet char* -> int konverziora, hasznalhatunk atoi-t.)
+3. Irjuk ki az aktualis rendszeridot!
+4. Irjuk at egy fajl utolso karakteret!
+5. Olvassunk ki soronkent egy fajlt, es irjuk ki a kepernyore rendezve a tartalmat! (pelda: abc.txt)
+6. Szimulaljuk ket hatoldalu dobokockanak az osszeget random szam segitsegevel!

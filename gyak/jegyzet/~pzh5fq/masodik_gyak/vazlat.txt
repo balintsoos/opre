@@ -1,0 +1,26 @@
+argc, argv ismetles
+kozos gyakorlat: programhivas: "./arg elso masodik", mi argc es argv tartalma
+struct-ok c++-ban, c-ben (passwd.c)
+nincs konstruktor, nem tud logikat; csak adathalmaz (egybe csoportositott adatok)
+sizeof-fal le lehet kerdezni a teljes meretet, pointerekkel vigyazni
+
+open, fopen
+(text.txt, file.c, open_fopen.c)
+kozos gyakorlat open-nel file tartalmat kiolvasni
+egybetartozo fv-nyek: 
+open, close, read, write, lseek
+fopen(TEXT), fclose, fgets, fputs
+fopen(BINARY), fclose, fread, fwrite, fseek
+
+onallo rovid gyakorlat: sajat nev kiirasa fajlba
+
+directory entries:
+ directory.c
+ https://linux.die.net/man/3/mkdir 
+time kezeles: 
+  http://www.cplusplus.com/reference/ctime/localtime/
+  mtime.c
+random szam kezeles:
+  rand.c
+
+onallo hosszabb gyakorlat (feladatok.txt)

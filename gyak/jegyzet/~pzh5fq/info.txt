@@ -1,0 +1,5 @@
+E-mail-cim (barmelyik jo):
+elte.robin.kiss@gmail.com
+gekko42@gmail.com
+
+vim segitseg: wiki.math.bme.hu/view/Vim

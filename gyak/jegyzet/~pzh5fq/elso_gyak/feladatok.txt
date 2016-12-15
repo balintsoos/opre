@@ -1,0 +1,11 @@
+1. Definialjunk egy stringet, majd irjuk ki a hosszat!
+2. Definialjunk ket stringet, irjuk ki, hogy megegyeznek-e!
+3. Foglaljunk le teruletet egy char*-nak, adjuk ertekul egy masiknak, majd ellenorizzuk, hogy nem ugyanoda vannak foglalva!
+
+4. Irjuk ki egymas utan a program bemeneti parametereit! Ugyanez forditott sorrendben.
+5. Irjuk ki egy program bemeneti parametereinek hosszainak az osszeget!
+6. Irjuk ki, ha egy programnak legalabb ket parametere van, es ezek mind megegyeznek!
+7. Ellenorizzuk, hogy egy programnak pontosan ket bemeno parametere van, majd irjuk ki ezeknek konkatenaltjat!
+
+Megoldasokat a feladatok.c -ben talaltok :)
+

@@ -1,0 +1,12 @@
+Hasznalhato szovegszerkesztok: barmi
+Javasolt szovegszerkesztok: vim, joe, mcedit
+C, C++, kulonbsegek, hasonlosagok
+gcc alapok, forditas, futtathato keszitese, kimenet allitasa
+c string, std::string vs char*
+string hossza, 0 karakter
+stringmuveletek: osszehasonlitas, appendalas, ertekadas
+helyfoglalas(malloc)
+input/output, printf, 0 valtozo, 1 vagy tobb valtozo, string, szam
+feladatok stringekre
+main(argc, argv), programparameterek
+feladok stringekre es programparameterekre
